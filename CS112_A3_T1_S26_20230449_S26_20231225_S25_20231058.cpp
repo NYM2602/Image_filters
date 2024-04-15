@@ -55,13 +55,18 @@ void flipVertical(Image& image);
 void darkenImage(Image& image);
 void lightenImage(Image& image);
 // Filter 8: Crop Image
+Image* cropImage(Image& image, float point_x , float point_y , float New_width , float New_height);
+int checkValidation(Image& image , float point_x , float point_y , float New_width , float New_height);
+bool isNumber(string input);
 // Filter 9: Add Frame
 // Filter 10: Detect Image Edges
 Image* detectImageEdges(Image&image);
 // Filter 11: Resize Image
+Image* resizeImage(double& New_height , double& New_width , Image& image );
 // Filter 12: Blur Image
 // Filter 15: TV Effect
 // Filter 16: Purple Effect
+void purpleImage(Image& image);
 // Filter 17: Infrared
 void infrared (Image&image);
 int main()
@@ -423,7 +428,38 @@ int main()
                     else if (tolower(option[0])=='h')
                     {
                         cout<<"\t\t\t\t\t\t****** Crop Image******"<<endl;
-                        //add filter(*image);
+                        cout << "********Crop Image********" << endl;
+                        string point_xstr,point_ystr,New_heightstr ,New_widthstr  ;
+                        cout << "Enter start point 1: ";
+                        cin >> point_xstr ;
+                        while(!isNumber(point_xstr)){
+                            cout<<"Invalid! Enter a valid number"<<endl;
+                            cin>>point_xstr;
+                        }
+                        cout << "Enter start point 2: ";
+                        cin >> point_ystr ;
+                        while(!isNumber(point_ystr)){
+                            cout<<"Invalid! Enter a valid number"<<endl;
+                            cin>>point_ystr;
+                        }
+                        cout << "Enter new width: ";
+                        cin >> New_widthstr ;
+                        while(!isNumber(New_widthstr)){
+                            cout<<"Invalid! Enter a valid number"<<endl;
+                            cin>>New_widthstr;
+                        }
+                        cout << "Enter new height: ";
+                        cin >> New_heightstr ;
+                        while(!isNumber(New_heightstr)){
+                            cout<<"Invalid! Enter a valid number"<<endl;
+                            cin>>New_heightstr;
+                        }
+                        float point_x = stof(point_xstr + ".0");
+                        float point_y  = stof(point_ystr  + ".0");
+                        float New_width = stof(New_widthstr + ".0");
+                        float New_height = stof(New_heightstr + ".0");
+                        checkValidation(*image , point_x , point_y , New_width , New_height);
+                        image = cropImage(*image, point_x , point_y , New_width , New_height);
                         while (true)
                         {
                             showMenu3();
@@ -536,7 +572,23 @@ int main()
                     else if (tolower(option[0])=='k')
                     {
                         cout<<"\t\t\t\t\t\t****** Resize Image ******"<<endl;
-                        invFilter(*image);
+                        string New_heightstr ,New_widthstr  ;
+                        cout << "Enter new width: ";
+                        cin >> New_widthstr ;
+                        while(!isNumber(New_widthstr)){
+                            cout<<"Invalid! Enter a valid number"<<endl;
+                            cin>>New_widthstr;
+                        }
+                        cout << "Enter new height: ";
+                        cin >> New_heightstr ;
+                        while(!isNumber(New_heightstr)){
+                            cout<<"Invalid! Enter a valid number"<<endl;
+                            cin>>New_heightstr;
+                        }
+                        double New_width = stof(New_widthstr + ".0");
+                        double New_height = stof(New_heightstr + ".0");
+
+                        image=resizeImage(New_height , New_width , *image);
                         while (true)
                         {
                             showMenu3();
@@ -547,7 +599,6 @@ int main()
                                 cout << "and specify extension .jpg, .bmp, .png, .tga: ";
                                 cin>> filename;
                                 (*image).saveImage(filename);
-                                system(filename.c_str());
                                 stop=false;
                                 break;
                             }
@@ -650,7 +701,8 @@ int main()
                     else if (tolower(option[0])=='n')
                     {
                         cout<<"\t\t\t\t\t\t****** Purple Effect ******"<<endl;
-                        invFilter(*image);
+                        purpleImage(*image);
+                        lightenImage(*image);
                         while (true)
                         {
                             showMenu3();
@@ -933,6 +985,42 @@ void lightenImage(Image& image)
     }
 }
 
+// Filter 8 : Crop Image
+Image* cropImage(Image& image , float point_x , float point_y , float New_width , float New_height){
+    Image* newImage = new Image(New_width , New_height);
+    for (float i = 0 ; i < New_width; i++){
+        for (float j = 0 ; j < New_height ; j++){
+            for (int k = 0 ; k < 3 ; k++){
+                (*newImage)(i,j,k) = image(point_x + i , point_y + j, k) ;
+            }
+        }
+    }
+    return newImage;
+}
+int checkValidation(Image& image , float point_x , float point_y , float New_width , float New_height){
+    while (true){
+    if (point_x + New_width < image.width){
+        break;}
+    else{
+        cout << "The image width is too large \n";
+        continue;}
+    if (point_y + New_height < image.height){
+        break;}
+    else{
+        cout << "The image height is too large \n";
+        continue;}
+    }
+    return 0 ;
+}
+bool isNumber( string input) {
+    for (char c : input) {
+        if (!isdigit(c) && c != '.') {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Filter 10: Detect Image Edges
 Image* detectImageEdges(Image&image)
 {
@@ -977,6 +1065,33 @@ Image* detectImageEdges(Image&image)
     }
     return edge;
 }
+// Filter 11: Resize Image
+Image* resizeImage(double& New_height , double& New_width , Image& image ){
+    Image* newImage = new Image(New_width, New_height);
+    double ratio_width = image.width / New_width ;
+    double ratio_height = image.height / New_height;
+    for (float i = 0 ; i < New_width ; i++){
+        for (float j = 0 ; j < New_height ; j++){
+            for (int k = 0 ; k < 3 ; k++){
+                (*newImage)(i,j,k) = image(round(i*ratio_width) ,round(j*ratio_height) ,k);
+            }
+        }
+    }
+    return newImage;
+}
+
+// Filter 16: Purple Effect
+void purpleImage(Image& image){
+    for (int i = 0 ; i < image.width ; i++){
+        for (int j = 0 ; j < image.height ; j++){
+            for (int k = 0 ; k < 3 ; k++){
+                if (k == 1)
+                image (i,j,1) *= 0.7 ;
+            }
+        }
+    }
+}
+
 // Filter 17: Infrared
 void infrared (Image&image)
 {
