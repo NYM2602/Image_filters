@@ -1,24 +1,41 @@
 /* File: CS112_A3_Part1_S26_20230449_S26_20231225_S25_20231058.cpp
 
-   Purpose: Image processing tool that can apply 5 different filters.
+   System Diagram :
 
-   Authors: 1) Noura Yasser Mohamed Abdelhalim   Section: S26
-            2) Somaya Tamer Magdy Shoaib         Section: S26
-            3) Radwa Essam Mohamed El Sayed      Section: S25
+   Purpose: Image processing tool that can apply 15 different filters.
+
+   Authors: 1) Noura Yasser Mohamed Abdelhalim   Section: 26
+            2) Somaya Tamer Magdy Shoaib         Section: 26
+            3) Radwa Essam Mohamed El Sayed      Section: 25
 
    Emails: 1) nourata20066@gmail.com
            2) somayatamer2015@gmail.com
            3) radwaalkrargy@gmail.com
 
-  ID1: 20230449 Filter 3: "Invert Image"
-  ID2: 20231225 Filter 1 "Grayscale" & Filter 4 " Merge Images"
-  ID3: 20231058 Filter 2: "Black and White" & Filter 5: "Flip Image"
-*/
+   ID1: 20230449 Filter 3: "Invert Image"
+                 Filter 6: "Rotate Image"
+                 Filter 9: "Add Frame"
+                 Filter 12: "Blur Image"
+                 Filter 15: "TV Effect"
 
+   ID2: 20231225 Filter 1: "Gray Scale"
+                 Filter 4: "Merge Images"
+                 Filter 7: "Darken and Lighten Image"
+                 Filter 10: "Detect Image Edges"
+                 Filter 17: "Infrared"
+
+   ID3: 20231058 Filter 2: "Black and White"
+                 Filter 5: "Flip Image"
+                 Filter 8: "Crop Image"
+                 Filter 11: "Resize Image"
+                 Filter 16: "Purple Effect"
+
+*/
 #include <iostream>
 #include "Image_Class.h"
 #include <string>
 #include <fstream>
+#include <cmath>
 using namespace std;
 // **FUNCTIONS**
 void showMenu3();
@@ -33,7 +50,20 @@ Image* mergeImages(Image&image1, Image&image2);
 // Filter 5: Flip Image
 void flipHorizontal(Image& image);
 void flipVertical(Image& image);
-
+// Filter 6: Rotate Image
+// Filter 7: Darken and Lighten Image
+void darkenImage(Image& image);
+void lightenImage(Image& image);
+// Filter 8: Crop Image
+// Filter 9: Add Frame
+// Filter 10: Detect Image Edges
+Image* detectImageEdges(Image&image);
+// Filter 11: Resize Image
+// Filter 12: Blur Image
+// Filter 15: TV Effect
+// Filter 16: Purple Effect
+// Filter 17: Infrared
+void infrared (Image&image);
 int main()
 {
     while (true)
@@ -41,7 +71,7 @@ int main()
         string option,filename, filename2;
         bool stop=false;
         Image current;
-        cout<<"****** PhotoShop ******"<<endl;
+        cout<<"\t\t\t\t\t\t****** PhotoShop ******"<<endl;
         cout<<"What would you like to do today?"<<endl;
         cout<<"A) Filter an image"<<endl;
         cout<<"B) Exit"<<endl;
@@ -58,19 +88,29 @@ int main()
                 while (true)
                 {
                     cout<<"Choose filter you wish to apply"<<endl;
-                    cout<<"A)Grayscale " <<endl;
-                    cout<<"B)Black & White"<<endl;
-                    cout<<"C)Invert Image"<<endl;
-                    cout<<"D)Merge Images"<<endl;
-                    cout<<"E)Flip Image"<<endl;
-                    cout<<"F)Return"<<endl;
-                    cout<<"Please enter your choice (A/B/C/D/E/F/G): ";
+                    cout<<"A) Grayscale " <<endl;
+                    cout<<"B) Black & White"<<endl;
+                    cout<<"C) Invert Image"<<endl;
+                    cout<<"D) Merge Images"<<endl;
+                    cout<<"E) Flip Image"<<endl;
+                    cout<<"F) Rotate Image"<<endl;
+                    cout<<"G) Darken or Lighten "<<endl;
+                    cout<<"H) Crop Image"<<endl;
+                    cout<<"I) Add Frame"<<endl;
+                    cout<<"J) Detect Edges"<<endl;
+                    cout<<"K) Resize Image"<<endl;
+                    cout<<"L) Blur Image"<<endl;
+                    cout<<"M) TV Effect"<<endl;
+                    cout<<"N) Purple Effect"<<endl;
+                    cout<<"O) Infrared "<<endl;
+                    cout<<"P) Return"<<endl;
+                    cout<<"Please enter your choice (A-P): ";
                     cin>>option;
 
                     // Filter 1: Grayscale
                     if (tolower(option[0])=='a')
                     {
-                        cout<<"****** Grayscale ******"<<endl;
+                        cout<<"\t\t\t\t\t\t****** Grayscale ******"<<endl;
                         grayScale(*image);
                         while (true)
                         {
@@ -108,7 +148,7 @@ int main()
                     // Filter 2: Black and White
                     else if (tolower(option[0])=='b')
                     {
-                        cout<<" ****** Black & White ******"<<endl;
+                        cout<<"\t\t\t\t\t\t****** Black & White ******"<<endl;
                         blackAndWhite(*image);
                         while (true)
                         {
@@ -143,11 +183,10 @@ int main()
                             break;
                         }
                     }
-
                     // Filter 3: Invert Image
                     else if (tolower(option[0])=='c')
                     {
-                        cout<<" ****** Invert Image ******"<<endl;
+                        cout<<"\t\t\t\t\t\t****** Invert Image ******"<<endl;
                         invFilter(*image);
                         while (true)
                         {
@@ -186,7 +225,7 @@ int main()
                     // Filter 4: Merge Images
                     else if (tolower(option[0])=='d')
                     {
-                        cout<<" ****** Merge Images ******"<<endl;
+                        cout<<"\t\t\t\t\t\t****** Merge Images ******"<<endl;
                         cout << "Please enter filename of the second image: ";
                         cin >> filename2;
                         Image image2(filename2);
@@ -227,7 +266,7 @@ int main()
                     // Filter 5: Flip Image
                     else if (tolower(option[0])=='e')
                     {
-                        cout<<" ****** Flip Image ******"<<endl;
+                        cout<<"\t\t\t\t\t\t****** Flip Image ******"<<endl;
                         while (true)
                         {
                             string choice;
@@ -281,13 +320,417 @@ int main()
                             break;
                         }
                     }
+                    //Filter 6: Rotate Image
                     else if (tolower(option[0])=='f')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Rotate Image ******"<<endl;
+                        //(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //Filter 7: Darken or Lighten Image
+                    else if (tolower(option[0])=='g')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Darken or Lighten ******"<<endl;
+                        while (true)
+                        {
+                            string choice;
+                            cout<<"Choose filter you wish to apply"<<endl;
+                            cout<<"A)Lighten Filter"<<endl;
+                            cout<<"B)Darken Filter"<<endl;
+                            cout<<"Please enter your choice(A/B)"<<endl;
+                            cin>> choice;
+                            if (tolower(choice[0])=='a')
+                            {
+                                lightenImage(*image);
+                                break;
+                            }
+                            else if (tolower(choice[0])=='b')
+                            {
+                                darkenImage(*image);
+                                break;
+                            }
+                            else
+                            {
+                                cout << "Invalid! Please choose (A/B)"<<endl;
+                                continue;
+                            }
+                        }
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //Filter 8: Crop Image
+                    else if (tolower(option[0])=='h')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Crop Image******"<<endl;
+                        //add filter(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    // Filter 9: Adding Frame
+                    else if (tolower(option[0])=='i')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Add Frame ******"<<endl;
+                        invFilter(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //Filter 10: Detect Edges
+                    else if (tolower(option[0])=='j')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Detect Edges ******"<<endl;
+                        image = detectImageEdges(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //Filter 11: Resize Image
+                    else if (tolower(option[0])=='k')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Resize Image ******"<<endl;
+                        invFilter(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    // Filter 12: Blur Image
+                    else if (tolower(option[0])=='i')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Blur Image ******"<<endl;
+                        invFilter(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    // Filter 15 : TV Effect
+                    else if (tolower(option[0])=='m')
+                    {
+                        cout<<"\t\t\t\t\t\t****** TV Effect ******"<<endl;
+                        invFilter(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    // Filter 16: Purple Effect
+                    else if (tolower(option[0])=='n')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Purple Effect ******"<<endl;
+                        invFilter(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //Filter 17: Infrared Effect
+                    else if (tolower(option[0])=='o')
+                    {
+                        cout<<"\t\t\t\t\t\t****** Infrared ******"<<endl;
+                        infrared(*image);
+                        while (true)
+                        {
+                            showMenu3();
+                            cin>>option;
+                            if(tolower(option[0])=='a')
+                            {
+                                cout << "Please enter image name to store new image\n";
+                                cout << "and specify extension .jpg, .bmp, .png, .tga: ";
+                                cin>> filename;
+                                (*image).saveImage(filename);
+                                system(filename.c_str());
+                                stop=false;
+                                break;
+                            }
+                            else if (tolower(option[0])=='b')
+                            {
+                                stop=true;
+                                break;
+                            }
+                            else
+                            {
+                                cout<<"Invalid! Please choose (A/B)"<<endl;
+                            }
+                        }
+                        if (stop)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    // Return
+                    else if (tolower(option[0])=='p')
                     {
                         break;
                     }
+
                     else
                     {
-                        cout<<"Invalid! Please choose (A/B/C/D/E/F)"<<endl;
+                        cout<<"Invalid! Please choose (A-P)"<<endl;
                         continue;
                     }
                 }
@@ -300,7 +743,7 @@ int main()
         }
         else if (tolower(option[0])=='b')
         {
-            cout<<"****** Program Exited ******"<<endl;
+            cout<<"\t\t\t\t\t\t****** Program Exited ******"<<endl;
             break;
         }
         else
@@ -337,8 +780,6 @@ void grayScale(Image&image)
 //Filter 2 : Black & White
 void blackAndWhite(Image&image)
 {
-    float total_pixels;
-    total_pixels = image.height*image.width*3;
     for (int i = 0; i < image.width; ++i)
     {
         for (int j = 0; j < image.height; ++j)
@@ -458,6 +899,99 @@ void flipVertical(Image& image)
                 image(i,j,k) = image(i,height-1-j,k);
                 image(i,height-1-j,k) = temp;
             }
+        }
+    }
+}
+
+// Filter 7 : Darken and Lighten Image
+// Darken Function
+void darkenImage(Image& image)
+{
+    for(int x=0 ; x<image.width; ++x)
+    {
+        for(int y =0; y<image.height; ++y)
+        {
+            image (x, y, 0) = image(x, y, 0)*0.5;
+            image (x, y, 1) = image(x, y, 1)*0.5 ;
+            image (x, y, 2) = image(x, y, 2)*0.5;
+        }
+    }
+
+}
+
+// Light Function
+void lightenImage(Image& image)
+{
+    for(int x=0 ; x<image.width; ++x)
+    {
+        for(int y =0; y<image.height; ++y)
+        {
+            image(x, y, 0) = min(255, image(x,y,0)/2 + image(x,y,0));
+            image(x, y, 1) = min(255, image(x,y,1)/2 + image(x,y,1));
+            image(x, y, 2) = min(255, image(x,y,2)/2 + image(x,y,2));
+        }
+    }
+}
+
+// Filter 10: Detect Image Edges
+Image* detectImageEdges(Image&image)
+{
+// Canny Edge Detector Method
+// Convert to Gray scale
+    grayScale(image);
+// Gradient Calculation using Sobel operator
+    Image* edge = new Image(image.width, image.height); // The output image
+    int sobelX[3][3] = { {-1, 0, 1}, // The X direction kernel
+        {-2, 0, 2},
+        {-1, 0, 1}
+    };
+    int sobelY[3][3] = { {-1, -2, -1}, // The Y direction kernel
+        { 0,  0,  0},
+        { 1,  2,  1}
+    };
+    for (int x = 1; x < image.width - 1; ++x)
+    {
+        for (int y = 1; y < image.height - 1; ++y) // x=1 and width -1 to exclude pixels at the borders cause of the size of the kernal
+        {
+            float gX = 0.0f; // Gradient magnitude of X
+            float gY = 0.0f; // Gradient magnitude of Y
+            for (int dx = -1; dx <= 1; ++dx) // -1 to 1 since sobel X and Y are 3x3
+            {
+                for (int dy = -1; dy <= 1; ++dy)
+                {
+                    float intensity = image.getPixel(x + dx, y + dy, 0) * 0.299f  + // Gray scale factor for  Red channel , x+dx and y+dy are the neighboring pixels
+                                      image.getPixel(x + dx, y + dy, 1) * 0.587f + // Gray scale factor for Green channel
+                                      image.getPixel(x + dx, y + dy, 2) * 0.114f;  // Gray scale factor for Blue channel
+                    gX += intensity * sobelX[dx + 1][dy + 1]; // Multiply the intensity
+                    gY += intensity * sobelY[dx + 1][dy + 1];
+                }
+                int magnitude = sqrt(gX * gX + gY * gY);  // Calculate the magnitude of the gradient
+
+                int threshold = 250;
+                char edgeValue =(magnitude>threshold)?0:255;
+                edge->setPixel(x, y, 0, edgeValue); // -> not edge.setpixel cause edge is of pointer type
+                edge->setPixel(x, y, 1, edgeValue);
+                edge->setPixel(x, y, 2, edgeValue);
+            }
+        }
+    }
+    return edge;
+}
+// Filter 17: Infrared
+void infrared (Image&image)
+{
+    for(int x=0 ; x<image.width; ++x)
+    {
+        for(int y =0; y<image.height; ++y)
+        {
+            int green = image.getPixel(x,y,1);
+            int blue = image.getPixel(x,y,2);
+            green = 255- green ;
+            blue= 255- blue;
+
+            image.setPixel(x, y, 0, 255);  // Max the red
+            image.setPixel(x, y, 1, green);
+            image.setPixel(x, y, 2, blue);
         }
     }
 }
