@@ -1,6 +1,6 @@
-/* File: CS112_A3_Part1_S26_20230449_S26_20231225_S25_20231058.cpp
+/* File: CS112_A3_Part2B_S26_20230449_S26_20231225_S25_20231058.cpp
 
-   System Diagram :
+   System Diagram : https://drive.google.com/file/d/1ogWMyvqhh_2ntIgE7mXArpfORRdbDNNZ/view?usp=drive_link
 
    Purpose: Image processing tool that can apply 15 different filters.
 
@@ -51,6 +51,7 @@ Image* mergeImages(Image&image1, Image&image2);
 void flipHorizontal(Image& image);
 void flipVertical(Image& image);
 // Filter 6: Rotate Image
+void rotateImage(Image* image, int deg);
 // Filter 7: Darken and Lighten Image
 void darkenImage(Image& image);
 void lightenImage(Image& image);
@@ -59,16 +60,20 @@ Image* cropImage(Image& image, float point_x , float point_y , float New_width ,
 int checkValidation(Image& image , float point_x , float point_y , float New_width , float New_height);
 bool isNumber(string input);
 // Filter 9: Add Frame
+void frame(Image* image, char color, bool deco);
 // Filter 10: Detect Image Edges
 Image* detectImageEdges(Image&image);
 // Filter 11: Resize Image
 Image* resizeImage(double& New_height , double& New_width , Image& image );
 // Filter 12: Blur Image
+void blurImage(Image* image);
 // Filter 15: TV Effect
+void tvNoise(Image* image);
 // Filter 16: Purple Effect
 void purpleImage(Image& image);
 // Filter 17: Infrared
 void infrared (Image&image);
+
 int main()
 {
     while (true)
@@ -232,7 +237,15 @@ int main()
                     {
                         cout<<"\t\t\t\t\t\t****** Merge Images ******"<<endl;
                         cout << "Please enter filename of the second image: ";
-                        cin >> filename2;
+                        try
+                        {
+                            cin >> filename2;
+                        }
+                        catch (...)
+                        {
+                            cout<<"Invalid filename! Please try again."<<endl;
+                            continue;
+                        }
                         Image image2(filename2);
                         image = mergeImages(*image, image2);
                         while (true)
@@ -329,7 +342,32 @@ int main()
                     else if (tolower(option[0])=='f')
                     {
                         cout<<"\t\t\t\t\t\t****** Rotate Image ******"<<endl;
-                        //(*image);
+                        //ask for the degree of rotation
+                        int deg;
+                        while (true){
+                            string degOption;
+                            cout<<"Please choose the degree to rotate the image by: "<<endl;
+                            cout<<"A) 90 degrees"<<endl;
+                            cout<<"B) 180 degrees"<<endl;
+                            cout<<"C) 270 degrees"<<endl;
+                            cin>>degOption;
+                            if (tolower(degOption[0])=='a'){
+                                deg = 1;
+                                break;
+                            }
+                            else if (tolower(degOption[0])=='b'){
+                                deg = 2;
+                                break;
+                            }
+                            else if (tolower(degOption[0])=='c'){
+                                deg = 3;
+                                break;
+                            }
+                            else{
+                                cout<<"This is not a valid option! choose(A/B/C)"<<endl;
+                            }
+                        }
+                        rotateImage(image, deg);
                         while (true)
                         {
                             showMenu3();
@@ -497,7 +535,67 @@ int main()
                     else if (tolower(option[0])=='i')
                     {
                         cout<<"\t\t\t\t\t\t****** Add Frame ******"<<endl;
-                        invFilter(*image);
+                        //choose the color of the frame
+                        char color;
+                        while (true){
+                            string colorOption;
+                            cout<<"Please choose the color of the frame:"<<endl;
+                            cout<<"A) Red"<<endl;
+                            cout<<"B) Blue"<<endl;
+                            cout<<"C) Green"<<endl;
+                            cout<<"D) Yellow"<<endl;
+                            cout<<"E) Violet"<<endl;
+                            cout<<"F) Pink"<<endl;
+                            cin>>colorOption;
+                            if (tolower(colorOption[0])=='a'){
+                                color = 'r';//red
+                                break;
+                            }
+                            else if (tolower(colorOption[0])=='b'){
+                                color = 'b';//blue
+                                break;
+                            }
+                            else if (tolower(colorOption[0])=='c'){
+                                color = 'g';//green
+                                break;
+                            }
+                            else if (tolower(colorOption[0])=='d'){
+                                color = 'y';//yellow
+                                break;
+                            }
+                            else if (tolower(colorOption[0])=='e'){
+                                color = 'v';//violet
+                                break;
+                            }
+                            else if (tolower(colorOption[0])=='f'){
+                                color = 'p';//pink
+                                break;
+                            }
+                            else{
+                                cout<<"This is not a valid choice! choose(A/B/C/D/E/F)"<<endl;
+                            }
+                        }
+                        //ask if the frame should be decorated
+                        bool deco;
+                        while (true){
+                            string decoOption;
+                            cout<<"Do you want the frame to be decorated?"<<endl;
+                            cout<<"A) Yes"<<endl;
+                            cout<<"B) No"<<endl;
+                            cin>>decoOption;
+                            if (tolower(decoOption[0]) == 'a'){
+                                deco = true;
+                                break;
+                            }
+                            else if (tolower(decoOption[0]) == 'b'){
+                                deco = false;
+                                break;
+                            }
+                            else{
+                                cout<<"This is not a valid option! choose(A/B)"<<endl;
+                            }
+                        }
+                        frame(image, color, deco);
                         while (true)
                         {
                             showMenu3();
@@ -622,10 +720,10 @@ int main()
                         }
                     }
                     // Filter 12: Blur Image
-                    else if (tolower(option[0])=='i')
+                    else if (tolower(option[0])=='l')
                     {
                         cout<<"\t\t\t\t\t\t****** Blur Image ******"<<endl;
-                        invFilter(*image);
+                        blurImage(image);
                         while (true)
                         {
                             showMenu3();
@@ -663,7 +761,7 @@ int main()
                     else if (tolower(option[0])=='m')
                     {
                         cout<<"\t\t\t\t\t\t****** TV Effect ******"<<endl;
-                        invFilter(*image);
+                        tvNoise(image);
                         while (true)
                         {
                             showMenu3();
@@ -954,7 +1052,21 @@ void flipVertical(Image& image)
         }
     }
 }
-
+// Filter 6 : Rotate images
+void rotateImage(Image* image, int deg){
+    while (deg--)
+    {
+        Image* newImage = new Image((*image).height,(*image).width);
+        for (int i=0;i<(*image).width;i++){
+            for(int j=0;j<(*image).height;j++){
+                for(int k=0;k<3;k++){
+                    (*newImage)((*image).height-1-j,i,k) = (*image)(i,j,k);
+                }
+            }
+        }
+        *image = *newImage;
+    }
+}
 // Filter 7 : Darken and Lighten Image
 // Darken Function
 void darkenImage(Image& image)
@@ -1020,6 +1132,142 @@ bool isNumber( string input) {
     }
     return true;
 }
+//Filter 9 : Add Frame
+void frame(Image* image, char color, bool deco){
+    int red,green,blue;
+    //choose color
+    switch(color){
+        //red
+        case 'r':
+            red = 255;
+            green = 0;
+            blue = 0;
+            break;
+        //yellow
+        case 'y':
+            red = 255;
+            green = 255;
+            blue = 0;
+            break;
+        //green
+        case 'g':
+            red = 0;
+            green = 255;
+            blue = 0;
+            break;
+        //blue
+        case 'b':
+            red = 0;
+            green = 0;
+            blue = 255;
+            break;
+        //violet
+        case 'v':
+            red = 200;
+            green = 0;
+            blue = 255;
+            break;
+        //pink
+        case 'p':
+            red = 255;
+            green = 150;
+            blue = 180;
+            break;
+
+    }
+    //outer frame
+    //left vertical edge
+    int width = min((*image).width,(*image).height)/20 + 1;
+    for (int i=0;i<width;i++){
+        for(int j=0;j<(*image).height;j++){
+            (*image)(i,j,0) = red;
+            (*image)(i,j,1) = green;
+            (*image)(i,j,2) = blue;
+        }
+    }
+    //right vertical edge
+    for (int i=(*image).width-1;i>=(*image).width - width;i--){
+        for(int j=0;j<(*image).height;j++){
+            (*image)(i,j,0) = red;
+            (*image)(i,j,1) = green;
+            (*image)(i,j,2) = blue;
+        }
+    }
+    //upper horizontal edge
+    for (int i=0;i<(*image).width;i++){
+        for(int j=0;j<width;j++){
+            (*image)(i,j,0) = red;
+            (*image)(i,j,1) = green;
+            (*image)(i,j,2) = blue;
+        }
+    }
+    //lower horizontal edge
+    for (int i=0;i<(*image).width;i++){
+        for(int j=(*image).height-1;j>=(*image).height - width;j--){
+            (*image)(i,j,0) = red;
+            (*image)(i,j,1) = green;
+            (*image)(i,j,2) = blue;
+        }
+    }
+
+    //decoration
+    if (deco){
+        //two perpendicular white lines
+        //left
+        for (int i=width/2+1 ;i<=width/2 + width/10 +1;i++){
+            for(int j=0;j<(*image).height;j++){
+                (*image)(i,j,0) = 255;
+                (*image)(i,j,1) = 255;
+                (*image)(i,j,2) = 255;
+            }
+        }
+        //upper
+        for (int i=0;i<(*image).width;i++){
+            for(int j=width/2+1;j<=width/2 + width/10 + 1;j++){
+                (*image)(i,j,0) = 255;
+                (*image)(i,j,1) = 255;
+                (*image)(i,j,2) = 255;
+            }
+        }
+
+        //inner square on the top left
+        //vertical edge
+        for (int i=width*2+1 ;i<=width*2 + width/5 + 1;i++){
+            for(int j=0;j<=width*2 + width/5 + 1;j++){
+                (*image)(i,j,0) = 255;
+                (*image)(i,j,1) = 255;
+                (*image)(i,j,2) = 255;
+            }
+        }
+        //horizontal edge
+        for (int i=0;i<=width*2 + width/5 + 1;i++){
+            for(int j=width*2+1;j<=width*2 + width/5 + 1;j++){
+                (*image)(i,j,0) = 255;
+                (*image)(i,j,1) = 255;
+                (*image)(i,j,2) = 255;
+            }
+        }
+
+        //outer square on top left
+        //vertical edge
+        for (int i=width*3+1 ;i<=width*3 + width/10 + 1;i++){
+            for(int j=0;j<=width*3 + width/10 + 1;j++){
+                (*image)(i,j,0) = 255;
+                (*image)(i,j,1) = 255;
+                (*image)(i,j,2) = 255;
+            }
+        }
+        //horizontal edge
+        for (int i=0;i<=width*3 + width/10 + 1;i++){
+            for(int j=width*3+1;j<=width*3 + width/10 + 1;j++){
+                (*image)(i,j,0) = 255;
+                (*image)(i,j,1) = 255;
+                (*image)(i,j,2) = 255;
+            }
+        }
+    }
+
+}
 
 // Filter 10: Detect Image Edges
 Image* detectImageEdges(Image&image)
@@ -1078,6 +1326,44 @@ Image* resizeImage(double& New_height , double& New_width , Image& image ){
         }
     }
     return newImage;
+}
+// Filter 12 : Blur
+void blurImage(Image* image){
+    int blur_factor = min((*image).width,(*image).height)/100;
+    if (blur_factor == 0){
+        blur_factor = 2;
+    }
+    for (int i=0;i<(*image).width-blur_factor;i+=blur_factor){
+        for (int j=0;j<(*image).height-blur_factor;j+=blur_factor){
+            for (int k=0;k<3;k++){
+                int avg=0;
+                for(int x = i;x<i+blur_factor;x++){
+                    for(int y=j;y<j+blur_factor;y++){
+                        avg += (*image)(x,y,k);
+                    }
+                }
+                avg /= blur_factor*blur_factor;
+                for(int x = i;x<i+blur_factor;x++){
+                    for(int y=j;y<j+blur_factor;y++){
+                        (*image)(x,y,k) = avg;
+                    }
+                }
+            }
+        }
+    }
+
+}
+//Filter 15 : Old TV Effect
+void tvNoise(Image* image){
+    int rand = 0;
+    for (int i=rand;i<(*image).height;i+=2){
+        rand = (rand+1)%5;
+        for (int j=1;j<(*image).width;j++){
+            for (int k=0;k<3;k++){
+                (*image)(j,i,k) = ((*image)(j,i,k)+(*image)(j-1,i,k))%256;
+            }
+        }
+    }
 }
 
 // Filter 16: Purple Effect
